@@ -1,5 +1,12 @@
 #include "branch.h"
 
+/**
+ * @brief Determines the number of bits to be used for the prediction states
+ * @details
+ *  - PREDICTION_BITS should be a power of 2
+ *  - The number of bits to be used for a prediction state = log_2(PREDICTION_BITS) + 1
+ *  - The number of possible prediction states is 2 ^ (log_2(PREDICTION_BITS) + 1)
+ */
 #define PREDICTION_BITS 2
 
 typedef BranchHistoryTable PredictionTable;
@@ -157,16 +164,17 @@ void gshare_prediction(int global_history_bits, int address_bits) {
     // get the prediction entry at that position
     pred_state = PT.table[index];
 
-    // we AND with '10' (==2 in decimal) to get the value at the most significant bit
+    // we AND with '10' (==2 in decimal) to get the value at the most significant bit    
     pred_msb = pred_state & PREDICTION_BITS;
     // note that pred_msb can either be '10' (==2) or '00'(==0)
 
     // if pred_msb == 2, then MSB is 1
     // else if pred_msb == 0, then MSB is 0
-    prediction = pred_msb == 2 ? TAKEN : NOT_TAKEN;    
+    // prediction = pred_msb == 2 ? TAKEN : NOT_TAKEN;    
     // fprintf(pred_file, "%d ", prediction);
 
     // if the prediction is accurate, then increment the accuracy counter
+    // have to left-shit by log_2(PREDICTION_BITS)
     if ((ground_truth << 1) == pred_msb)
       acc_ctr++;
 
